@@ -16,8 +16,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(libvarint
-        varint/uleb128.h
-        varint/uleb128.cpp
+        varint/codecs/uleb128.h
+        varint/codecs/uleb128.cpp
         varint/varint.cpp
         varint/varint.h)
 target_include_directories(libvarint PUBLIC ${varint_SOURCE_DIR} ${MICROSOFT.GSL_ROOT}/include)
