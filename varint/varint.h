@@ -43,6 +43,11 @@ class varint {
   friend std::istream& operator>>(std::istream& is,
                                   varint<Codec, Container>& vi);
 
+  /** Write to a stream */
+  template <typename Codec, typename Container>
+  friend std::ostream& operator<<(std::ostream& os,
+                                  varint<Codec, Container>& vi);
+
   /** Create from a buffer */
   explicit varint(Container data);
 
@@ -175,6 +180,13 @@ std::istream& operator>>(std::istream& is, varint<Codec, Container>& vi) {
               std::istreambuf_iterator<char>(),
               vi.output_iterator(container_traits<Container>::capacity_type{}));
   return is;
+}
+
+template <typename Codec, typename Container>
+std::ostream& operator<<(std::ostream& os, varint<Codec, Container>& vi) {
+  std::copy(std::begin(vi.data_), std::end(vi.data_),
+            std::ostreambuf_iterator<char>(os));
+  return os;
 }
 
 }  // namespace varint
