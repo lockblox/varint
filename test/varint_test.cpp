@@ -34,7 +34,18 @@ TEST(varint, input_stream) {
   EXPECT_EQ(vi, static_cast<varint_string>(128u));
   auto hello = std::string{};
   std::copy(std::istreambuf_iterator<char>(is),
-              std::istreambuf_iterator<char>(),
-              std::back_inserter(hello));
+            std::istreambuf_iterator<char>(), std::back_inserter(hello));
   EXPECT_EQ("hello", hello);
+}
+
+TEST(varint, output_stream) {
+  std::ostringstream os;
+  using varint_string = varint::uleb128<std::string>;
+  auto vis = varint_string{16384u};
+  os << "hello";
+  os << vis;
+  os << "world";
+  auto expected = std::string{'h', 'e', 'l', 'l', 'o', -128, -128,
+                              1,   'w', 'o', 'r', 'l', 'd'};
+  EXPECT_EQ(expected, os.str());
 }
