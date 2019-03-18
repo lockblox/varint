@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <stdexcept>
 #include <string_view>
 
 namespace varint {
@@ -77,9 +78,12 @@ Integral uleb128::decode(InputIterator first, InputIterator last) {
                 "value_type of iterator must be byte sized");
   Integral value = 0;
   Integral multiplier = 1;
-  while ((*first & 0x80) != 0) {
+  while (first != last && (*first & 0x80) != 0) {
     value = add(value, (*first++ & 0x7f) * multiplier);
     multiplier *= 128;
+  }
+  if (first == last) {
+    throw std::out_of_range("incomplete varint encoding");
   }
   return add(value, *first++ * multiplier);
 }
@@ -98,13 +102,14 @@ constexpr std::size_t uleb128::size(Integral input) {
 
 template <typename InputIterator>
 constexpr std::size_t uleb128::size(InputIterator first, InputIterator last) {
+  using value_type = typename std::iterator_traits<InputIterator>::value_type;
   static_assert(std::is_integral<value_type>::value,
                 "value_type of iterator must be an integral type");
   static_assert(sizeof(value_type) == 1,
                 "value_type of iterator must be byte sized");
   if (first == last) return 0;
   for (std::size_t result = 1; first != last; ++first, ++result) {
-    if (*first & 0x80 == 0) {
+    if ((*first & 0x80) == 0) {
       return result;
     }
   }

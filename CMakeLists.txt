@@ -29,4 +29,5 @@ else()
     # lots of warnings and all warnings as errors
     target_compile_options(libvarint PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
+enable_testing()
 add_subdirectory(test)

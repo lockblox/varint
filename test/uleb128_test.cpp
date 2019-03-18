@@ -10,7 +10,8 @@ class round_trip_test : public testing::TestWithParam<std::size_t> {};
 TEST_P(encoding_test, encoding) {
   auto [input, expected] = GetParam();
   auto result = std::string{};
-  auto size = varint::codecs::uleb128::encode(input, std::back_inserter(result));
+  auto size =
+      varint::codecs::uleb128::encode(input, std::back_inserter(result));
   EXPECT_EQ(expected.size(), size);
   EXPECT_TRUE(std::equal(result.begin(), result.end(), expected.begin()));
   EXPECT_EQ(result.size(), varint::codecs::uleb128::size(input));
@@ -21,8 +22,8 @@ TEST_P(round_trip_test, round_trip) {
   using uleb128 = varint::codecs::uleb128;
   auto input = GetParam();
   auto encoded = std::string{};
-  auto size = varint::codecs::uleb128::encode(input, std::back_inserter(encoded));
-  auto decoded = varint::codecs::uleb128::decode(encoded.begin(), encoded.end());
+  uleb128::encode(input, std::back_inserter(encoded));
+  auto decoded = uleb128::decode(encoded.begin(), encoded.end());
   EXPECT_EQ(input, decoded);
 }
 
@@ -40,5 +41,5 @@ INSTANTIATE_TEST_CASE_P(varint, round_trip_test,
                                           65535, 65536, 2147483647, 2147483648,
                                           4294967295, 4294967296,
                                           9223372036854775807,
-                                          9223372036854775808,
-                                          18446744073709551615));
+                                          9223372036854775808u,
+                                          18446744073709551615u));
