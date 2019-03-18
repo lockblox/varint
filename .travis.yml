@@ -9,21 +9,24 @@ compiler: gcc
 
 cache:
   directories:
-  - $HOME/.ccache
-  - $HOME/vcpkg
+  - ${HOME}/.ccache
+  - ${HOME}/vcpkg
 
 install:
     - if [ $TRAVIS_OS_NAME == osx ]; then
         brew update;
         brew install cmake ccache;
         export PATH="/usr/local/opt/ccache/libexec:$PATH";
-        if [ ! -d $HOME/vcpkg ]; then
+        if [ ! -d ${HOME}/vcpkg ]; then
+          echo "vcpkg not found, installing...";
+          cd ${HOME};
           git clone https://github.com/Microsoft/vcpkg.git;
-          cd vcpkg;
+          cd ${HOME}/vcpkg;
           ./bootstrap-vcpkg.sh;
           ./vcpkg integrate install;
           ./vcpkg install gtest;
         fi;
+        echo "Using existing vcpkg installation at ${HOME}/vcpkg";
         cd ${HOME}/vcpkg;
         git pull origin master;
         ./vcpkg upgrade;
