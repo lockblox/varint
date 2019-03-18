@@ -23,7 +23,7 @@ install:
           ./bootstrap-vcpkg.sh;
           ./vcpkg integrate install;
           ./vcpkg install gtest;
-        fi
+        fi;
         cd ${HOME}/vcpkg;
         git pull origin master;
         ./vcpkg upgrade;
