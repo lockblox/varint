@@ -21,7 +21,7 @@ TEST(varint, assignment) {
   auto copy = via;
   EXPECT_EQ(via, copy);
   EXPECT_THROW(via = 65536u, std::out_of_range);
-  EXPECT_THROW(static_cast<char>(via), std::overflow_error);
+  EXPECT_THROW(auto c = static_cast<char>(via), std::overflow_error);
   EXPECT_EQ(static_cast<unsigned int>(via), 1233);
 }
 

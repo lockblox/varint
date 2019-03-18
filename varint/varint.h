@@ -1,5 +1,6 @@
 #pragma once
 #include <varint/codecs/uleb128.h>
+#include <iterator>
 #include <string>
 #include <type_traits>
 
@@ -39,14 +40,14 @@ class varint {
   auto cend() const { return std::end(data_); }
 
   /** Read from a stream */
-  template <typename Codec, typename Container>
+  template <typename CodecT, typename ContainerT>
   friend std::istream& operator>>(std::istream& is,
-                                  varint<Codec, Container>& vi);
+                                  varint<CodecT, ContainerT>& vi);
 
   /** Write to a stream */
-  template <typename Codec, typename Container>
+  template <typename CodecT, typename ContainerT>
   friend std::ostream& operator<<(std::ostream& os,
-                                  varint<Codec, Container>& vi);
+                                  varint<CodecT, ContainerT>& vi);
 
   /** Create from a buffer */
   explicit varint(Container data);
@@ -109,7 +110,8 @@ varint<Codec, Container>::varint(Integral value) {
 template <typename Codec, typename Container>
 template <typename Integral>
 varint<Codec, Container>& varint<Codec, Container>::operator=(Integral value) {
-  assign(value, container_traits<Container>::capacity_type{});
+  using capacity_type = typename container_traits<Container>::capacity_type;
+  assign(value, capacity_type{});
   return *this;
 }
 
@@ -153,8 +155,8 @@ varint<Codec, Container>::operator Integral() const {
   static_assert(std::is_integral<Integral>::value,
                 "cannot cast to non-integral type");
   using InputIterator = decltype(std::begin(data_));
-  return Codec::decode<InputIterator, Integral>(std::begin(data_),
-                                                std::end(data_));
+  return Codec::template decode<InputIterator, Integral>(std::begin(data_),
+                                                         std::end(data_));
 }
 
 template <typename Codec, typename LhsContainer, typename RhsContainer>
@@ -176,9 +178,10 @@ constexpr std::size_t varint<Codec, Container>::size() const {
 
 template <typename Codec, typename Container>
 std::istream& operator>>(std::istream& is, varint<Codec, Container>& vi) {
+  using capacity_type = typename container_traits<Container>::capacity_type;
   Codec::copy(std::istreambuf_iterator<char>(is),
               std::istreambuf_iterator<char>(),
-              vi.output_iterator(container_traits<Container>::capacity_type{}));
+              vi.output_iterator(capacity_type()));
   return is;
 }
 

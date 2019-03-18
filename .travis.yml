@@ -1,0 +1,59 @@
+sudo: required
+
+services:
+    - docker
+
+language: cpp
+
+compiler: gcc
+
+cache:
+  directories:
+  - $HOME/.ccache
+  - $HOME/vcpkg
+
+install:
+    - if [ $TRAVIS_OS_NAME == osx ]; then
+        brew update;
+        brew install cmake ccache;
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        if [ ! -d $HOME/vcpkg ]; then
+          git clone https://github.com/Microsoft/vcpkg.git;
+          cd vcpkg;
+          ./bootstrap-vcpkg.sh;
+          ./vcpkg integrate install;
+          ./vcpkg install gtest;
+        fi
+        cd ${HOME}/vcpkg;
+        git pull origin master;
+        ./vcpkg upgrade;
+      fi
+
+script:
+    - if [ $TRAVIS_OS_NAME == osx ]; then
+        mkdir build;
+        cd build;
+        export TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake;
+        cmake -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} ..;
+        make;
+        make test;
+      fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then
+          env;
+          mv -v ${PWD} ${HOME}/src;
+          docker run -v ${HOME}:/root
+                     -e TRAVIS_JOB_ID="${TRAVIS_JOB_ID}"
+                     -e TRAVIS_BRANCH="${TRAVIS_BRANCH}"
+                     --privileged -it lockblox/orthodox;
+      fi
+
+branches:
+    only:
+    - master
+
+notification:
+    email: true
+
+os:
+- linux
+- osx
