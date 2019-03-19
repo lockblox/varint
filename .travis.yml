@@ -21,6 +21,7 @@ install:
         brew update;
         brew install cmake ccache;
         export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        export VCPKG_ALLOW_APPLE_CLANG=1;
         VCPKG_FOUND=`find ${HOME}/vcpkg | wc -l`
         if [ ${VCPKG_FOUND} -lt 2 ]; then
           echo "vcpkg not found, installing...";
