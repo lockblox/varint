@@ -19,9 +19,7 @@ install:
     - |
       if [ $TRAVIS_OS_NAME == osx ]; then
         brew update;
-        brew install cmake ccache;
-        export PATH="/usr/local/opt/ccache/libexec:$PATH";
-        export VCPKG_ALLOW_APPLE_CLANG=1;
+        brew install cmake ccache gcc6;
         VCPKG_FOUND=`find ${HOME}/vcpkg | wc -l`
         if [ ${VCPKG_FOUND} -lt 2 ]; then
           echo "vcpkg not found, installing...";
@@ -41,6 +39,7 @@ install:
 script:
     - |
       if [ $TRAVIS_OS_NAME == osx ]; then
+        export PATH="/usr/local/opt/ccache/libexec:$PATH";
         mkdir build;
         cd build;
         export TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake;
