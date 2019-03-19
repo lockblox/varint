@@ -12,7 +12,8 @@ install:
   - cd vcpkg
   - .\bootstrap-vcpkg.bat
   - .\vcpkg integrate install
-  - .\vcpkg install gtest
+  - .\vcpkg install gtest:x64-windows
+  - .\vcpkg install gtest:x86-windows
 
 before_build:
   - cmake -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=C:/projects/cpp-varint/vcpkg/scripts/buildsystems/vcpkg.cmake C:/projects/cpp-varint
