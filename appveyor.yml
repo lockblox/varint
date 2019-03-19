@@ -1,0 +1,28 @@
+image: Visual Studio 2017
+
+platform:
+  - x86
+  - x64
+
+configuration:
+  - Release
+
+install:
+  - git clone https://github.com/Microsoft/vcpkg.git
+  - cd vcpkg
+  - .\bootstrap-vcpkg.bat
+  - .\vcpkg integrate install
+  - .\vcpkg install gtest
+
+before_build:
+  - cmake -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake;
+
+build:
+  project: ALL_BUILD.vcxproj
+  verbosity: minimal
+
+test_script:
+  - ctest -C %CONFIGURATION%
+
+cache:
+  - C:/.hunter
