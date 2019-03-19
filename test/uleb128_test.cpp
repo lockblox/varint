@@ -25,6 +25,8 @@ TEST_P(round_trip_test, round_trip) {
   uleb128::encode(input, std::back_inserter(encoded));
   auto decoded = uleb128::decode(encoded.begin(), encoded.end());
   EXPECT_EQ(input, decoded);
+  EXPECT_THROW(auto output = uleb128::decode(encoded.end(), encoded.end()),
+               std::out_of_range);
 }
 
 INSTANTIATE_TEST_CASE_P(
