@@ -15,11 +15,16 @@ cache:
   - ${HOME}/vcpkg
   - ${HOME}/Library/Caches/Homebrew
 
+addons:
+  homebrew:
+    packages:
+    - cmake
+    - ccache
+    - gcc@7
+    
 install:
     - |
       if [ $TRAVIS_OS_NAME == osx ]; then
-        brew update;
-        brew install cmake ccache gcc7;
         export CXX=g++-7;
         export CC=gcc-7;
         VCPKG_FOUND=`find ${HOME}/vcpkg | wc -l`
