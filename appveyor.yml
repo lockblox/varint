@@ -9,9 +9,11 @@ configuration:
 
 install:
   - cd C:/projects
-  - git clone https://github.com/Microsoft/vcpkg.git
-  - cd vcpkg
-  - .\bootstrap-vcpkg.bat
+  - if not exist C:/project/vcpkg (
+      git clone https://github.com/Microsoft/vcpkg.git && 
+      cd vcpkg && 
+      .\bootstrap-vcpkg.bat)
+  - cd C:/projects/vcpkg
   - .\vcpkg integrate install
   - .\vcpkg install gtest:x64-windows
   - .\vcpkg install gtest:x86-windows
