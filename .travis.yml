@@ -42,11 +42,12 @@ script:
     - |
       if [ $TRAVIS_OS_NAME == osx ]; then
         export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        env;
         cd ${HOME};
         mkdir build;
         cd build;
-        export TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake;
-        cmake -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} ${HOME}/${TRAVIS_REPO_SLUG}
+        export TOOLCHAIN_FILE=${HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake;
+        cmake -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} ${TRAVIS_BUILD_DIR}
         make;
         make test;
       fi
