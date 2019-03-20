@@ -8,6 +8,7 @@ configuration:
   - Release
 
 install:
+  - cd C:/projects
   - git clone https://github.com/Microsoft/vcpkg.git
   - cd vcpkg
   - .\bootstrap-vcpkg.bat
@@ -16,7 +17,10 @@ install:
   - .\vcpkg install gtest:x86-windows
 
 before_build:
-  - cmake -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=C:/projects/cpp-varint/vcpkg/scripts/buildsystems/vcpkg.cmake C:/projects/cpp-varint
+  - cd C:/projects/cpp-varint
+  - mkdir build
+  - cd build
+  - cmake -G"Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake ..
 
 build:
   project: ALL_BUILD.vcxproj
@@ -26,4 +30,4 @@ test_script:
   - ctest -C %CONFIGURATION%
 
 cache:
-  - C:/.hunter
+  - C:/projects/vcpkg
