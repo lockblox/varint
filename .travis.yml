@@ -42,6 +42,8 @@ script:
     - |
       if [ $TRAVIS_OS_NAME == osx ]; then
         export PATH="/usr/local/opt/ccache/libexec:$PATH";
+        export CXX=g++;
+        export CC=gcc;
         env;
         cd ${HOME};
         mkdir build;
