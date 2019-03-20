@@ -9,7 +9,7 @@ configuration:
 
 install:
   - cd C:/projects
-  - if not exist C:/project/vcpkg (
+  - if not exist C:/projects/vcpkg (
       git clone https://github.com/Microsoft/vcpkg.git && 
       cd vcpkg && 
       .\bootstrap-vcpkg.bat)
