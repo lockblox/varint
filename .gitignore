@@ -33,4 +33,5 @@
 
 # IDE files
 .vs
+.vscode
 compile_commands.json
