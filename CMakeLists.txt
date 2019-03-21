@@ -20,7 +20,7 @@ add_library(libvarint
         varint/codecs/uleb128.cpp
         varint/varint.cpp
         varint/varint.h)
-target_include_directories(libvarint PUBLIC ${varint_SOURCE_DIR} ${MICROSOFT.GSL_ROOT}/include)
+target_include_directories(libvarint PUBLIC ${varint_SOURCE_DIR})
 set_target_properties(libvarint PROPERTIES OUTPUT_NAME varint)
 if (MSVC)
     # warning level 4 and all warnings as errors
