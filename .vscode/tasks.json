@@ -4,7 +4,52 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "docker",
+            "label": "cmake build",
+            "type": "shell",
+            "windows": {
+                "command": "cmake",
+                "args": [
+                    "--build",
+                    ".",
+                    "-j",
+                    "${env:NUMBER_OF_PROCESSORS}"
+                ],
+                "options": {
+                    "cwd": "${config:cmake.buildRoot}/${workspaceRootFolderName}"
+                }
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "cmake configure",
+            "type": "process",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "${config:cmake.buildRoot}/${workspaceRootFolderName}",
+                "-DMSVC_TOOLSET_VERSION=150",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_TOOLCHAIN_FILE=${config:cmake.toolchainFile}",
+                "${workspaceFolder}"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "docker run",
             "type": "shell",
             "windows": {
                 "command": "docker",
@@ -12,11 +57,11 @@
                     "run",
                     "--rm",
                     "-v",
-                    "${workspaceFolder}:/root/src",
+                    "${workspaceFolder}:/root/src:ro",
                     "--privileged",
                     "-it",
                     "cpp-ipfs/cpp-varint"
-                ],
+                ]
             },
             "problemMatcher": {
                 "owner": "cpp",
@@ -25,7 +70,7 @@
                     "${workspaceFolder}"
                 ],
                 "pattern": {
-                    "regexp": "^(\/root\/src\/)(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "regexp": "^(/root/src/)(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
                     "file": 2,
                     "line": 3,
                     "column": 4,
@@ -33,10 +78,14 @@
                     "message": 6
                 }
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
             }
-        },
+        }
     ]
 }
