@@ -1,3 +1,0 @@
-{
-    "cmake.buildDirectory": "${env:HOMEPATH}/CMakeBuilds/cpp-varint"
-}
