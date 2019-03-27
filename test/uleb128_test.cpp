@@ -25,7 +25,7 @@ TEST_P(round_trip_test, round_trip) {
   uleb128::encode(input, std::back_inserter(encoded));
   auto decoded = uleb128::decode(encoded.begin(), encoded.end());
   EXPECT_EQ(input, decoded);
-  EXPECT_THROW(auto output = uleb128::decode(encoded.end(), encoded.end()),
+  EXPECT_THROW(uleb128::decode(encoded.end(), encoded.end()),
                std::out_of_range);
 }
 
@@ -36,7 +36,7 @@ INSTANTIATE_TEST_CASE_P(
                       std::pair{128, std::string{-128, 1}},
                       std::pair{255, std::string{-1, 1}},
                       std::pair{300, std::string{-84, 2}},
-                      std::pair{16384, std::string{-128, -128, 1}}));
+                      std::pair{16384, std::string{-128, -128, 1}}), );
 
 INSTANTIATE_TEST_CASE_P(varint, round_trip_test,
                         ::testing::Values(0, 127, 128, 255, 256, 32767, 32768,
@@ -44,4 +44,4 @@ INSTANTIATE_TEST_CASE_P(varint, round_trip_test,
                                           4294967295, 4294967296,
                                           9223372036854775807,
                                           9223372036854775808u,
-                                          18446744073709551615u));
+                                          18446744073709551615u), );
