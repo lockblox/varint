@@ -15,14 +15,13 @@ TEST(varint, compare) {
 TEST(varint, assignment) {
   using array = std::array<char, 2>;
   using varint_array = varint::uleb128<array>;
-  using inserter = std::back_insert_iterator<array>;
   varint_array via;
   via = 1233u;
   auto copy = via;
   EXPECT_EQ(via, copy);
   EXPECT_THROW(via = 65536u, std::out_of_range);
-  EXPECT_THROW(auto c = static_cast<char>(via), std::overflow_error);
-  EXPECT_EQ(static_cast<unsigned int>(via), 1233);
+  EXPECT_THROW((void)(static_cast<char>(via)), std::overflow_error);
+  EXPECT_EQ(static_cast<unsigned int>(via), 1233u);
 }
 
 TEST(varint, input_stream) {
