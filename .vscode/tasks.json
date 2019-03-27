@@ -10,9 +10,7 @@
                 "command": "cmake",
                 "args": [
                     "--build",
-                    ".",
-                    "-j",
-                    "${env:NUMBER_OF_PROCESSORS}"
+                    "."
                 ],
                 "options": {
                     "cwd": "${config:cmake.buildRoot}/${workspaceRootFolderName}"
