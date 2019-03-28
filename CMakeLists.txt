@@ -32,7 +32,7 @@ configure_package_config_file(
     INSTALL_DESTINATION share/cmake/varint
 )
 
-install(EXPORT varintTargets DESTINATION lib/cmake/varint)
+install(EXPORT varintTargets DESTINATION share/cmake/varint)
 install(FILES "${varint_BINARY_DIR}/varintConfigVersion.cmake"
               "${varint_BINARY_DIR}/varintConfig.cmake"
         DESTINATION share/cmake/varint)
