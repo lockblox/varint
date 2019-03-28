@@ -10,7 +10,7 @@ configuration:
 install:
   - cd C:/projects
   - if not exist C:/projects/vcpkg (
-      git clone https://github.com/Microsoft/vcpkg.git && 
+      git clone https://github.com/cpp-ipfs/vcpkg.git && 
       cd vcpkg && 
       .\bootstrap-vcpkg.bat)
   - cd C:/projects/vcpkg
