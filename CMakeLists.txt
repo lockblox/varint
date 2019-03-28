@@ -29,13 +29,13 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${varint_SOURCE_DIR}/cmake/varintConfig.cmake"
     "${varint_BINARY_DIR}/varintConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/varint
+    INSTALL_DESTINATION share/cmake/varint
 )
 
 install(EXPORT varintTargets DESTINATION lib/cmake/varint)
 install(FILES "${varint_BINARY_DIR}/varintConfigVersion.cmake"
               "${varint_BINARY_DIR}/varintConfig.cmake"
-        DESTINATION lib/cmake/varint)
+        DESTINATION share/cmake/varint)
 install(DIRECTORY ${varint_SOURCE_DIR}/varint/ 
         DESTINATION include/varint
         FILES_MATCHING PATTERN "*.h")
