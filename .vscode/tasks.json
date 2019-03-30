@@ -58,7 +58,7 @@
                     "${workspaceFolder}:/root/src:ro",
                     "--privileged",
                     "-it",
-                    "cpp-ipfs/cpp-varint"
+                    "cppipfs/cpp-varint"
                 ]
             },
             "problemMatcher": {
