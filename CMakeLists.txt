@@ -46,6 +46,8 @@ if(BUILD_TESTING)
                    test/varint_test.cpp 
                    test/uleb128_test.cpp 
                    test/main.cpp
+                   varint/detail/extent_type.h
+                   varint/detail/extent_type.cpp
                    varint/codecs/uleb128.h
                    varint/codecs/uleb128.cpp
                    varint/varint.cpp
