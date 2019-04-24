@@ -1,27 +1,10 @@
 #pragma once
 #include <varint/codecs/uleb128.h>
+#include <varint/detail/extent_type.h>
 #include <iterator>
 #include <string>
-#include <type_traits>
 
 namespace varint {
-
-struct dynamic_capacity_tag {};
-struct static_capacity_tag {};
-
-template <typename Container, typename = void>
-class container_traits {
- public:
-  using capacity_type = static_capacity_tag;
-};
-
-template <typename Container>
-class container_traits<Container,
-                       std::void_t<decltype(std::declval<Container>().push_back(
-                           std::declval<typename Container::value_type>()))>> {
- public:
-  using capacity_type = dynamic_capacity_tag;
-};
 
 /** Value type holding a varint-encoded integral value */
 template <typename Codec, typename Container>
@@ -71,14 +54,14 @@ class varint {
   constexpr std::size_t size() const;
 
  private:
-  auto output_iterator(dynamic_capacity_tag);
-  auto output_iterator(static_capacity_tag);
+  auto output_iterator(detail::dynamic_extent_t);
+  auto output_iterator(detail::static_extent_t);
 
   template <typename Integral>
-  void assign(Integral value, static_capacity_tag capacity_tag);
+  void assign(Integral value, detail::static_extent_t extent);
 
   template <typename Integral>
-  void assign(Integral value, dynamic_capacity_tag capacity_tag);
+  void assign(Integral value, detail::dynamic_extent_t extent);
 
   Container data_;
 };
@@ -110,25 +93,25 @@ varint<Codec, Container>::varint(Integral value) {
 template <typename Codec, typename Container>
 template <typename Integral>
 varint<Codec, Container>& varint<Codec, Container>::operator=(Integral value) {
-  using capacity_type = typename container_traits<Container>::capacity_type;
-  assign(value, capacity_type{});
+  using extent_type = typename detail::extent_type<Container>::type;
+  assign(value, extent_type{});
   return *this;
 }
 
 template <typename Codec, typename Container>
-auto varint<Codec, Container>::output_iterator(dynamic_capacity_tag) {
+auto varint<Codec, Container>::output_iterator(detail::dynamic_extent_t) {
   return std::back_inserter(data_);
 }
 
 template <typename Codec, typename Container>
-auto varint<Codec, Container>::output_iterator(static_capacity_tag) {
+auto varint<Codec, Container>::output_iterator(detail::static_extent_t) {
   return std::begin(data_);
 }
 
 template <typename Codec, typename Container>
 template <typename Integral>
 void varint<Codec, Container>::assign(Integral value,
-                                      static_capacity_tag capacity_tag) {
+                                      detail::static_extent_t extent) {
   static_assert(std::is_signed<Integral>::value ==
                 std::is_signed<Codec>::value);
   if (size() < Codec::size(value)) {
@@ -136,17 +119,17 @@ void varint<Codec, Container>::assign(Integral value,
                             " too large for varint buffer of size " +
                             std::to_string(size()));
   }
-  Codec::encode(value, output_iterator(capacity_tag));
+  Codec::encode(value, output_iterator(extent));
 }
 
 template <typename Codec, typename Container>
 template <typename Integral>
 void varint<Codec, Container>::assign(Integral value,
-                                      dynamic_capacity_tag capacity_tag) {
+                                      detail::dynamic_extent_t extent) {
   static_assert(std::is_signed<Integral>::value ==
                 std::is_signed<Codec>::value);
   data_.clear();
-  data_.resize(Codec::encode(value, output_iterator(capacity_tag)));
+  data_.resize(Codec::encode(value, output_iterator(extent)));
 }
 
 template <typename Codec, typename Container>
@@ -178,10 +161,10 @@ constexpr std::size_t varint<Codec, Container>::size() const {
 
 template <typename Codec, typename Container>
 std::istream& operator>>(std::istream& is, varint<Codec, Container>& vi) {
-  using capacity_type = typename container_traits<Container>::capacity_type;
+  using extent_type = typename detail::extent_type<Container>::type;
   Codec::copy(std::istreambuf_iterator<char>(is),
               std::istreambuf_iterator<char>(),
-              vi.output_iterator(capacity_type()));
+              vi.output_iterator(extent_type()));
   return is;
 }
 
