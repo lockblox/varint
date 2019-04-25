@@ -2,6 +2,7 @@
 #include <varint/codecs/uleb128.h>
 #include <varint/varint.h>
 #include <array>
+#include <functional>
 
 TEST(varint, compare) {
   using array = std::array<char, 2>;
@@ -17,6 +18,7 @@ TEST(varint, compare) {
   EXPECT_NE(via, vis);
   vis = 11658u;
   EXPECT_GT(vis, via);
+  EXPECT_TRUE(std::less<>{}(via, vis));
 }
 
 TEST(varint, assignment) {
