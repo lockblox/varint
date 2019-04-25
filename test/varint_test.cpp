@@ -10,6 +10,13 @@ TEST(varint, compare) {
   auto via = varint_array{128u};
   auto vis = varint_string{{-128, 1}};
   EXPECT_EQ(via, vis);
+  via = 117u;
+  EXPECT_LT(via, vis);
+  EXPECT_GE(vis, via);
+  EXPECT_LE(via, vis);
+  EXPECT_NE(via, vis);
+  vis = 11658u;
+  EXPECT_GT(vis, via);
 }
 
 TEST(varint, assignment) {

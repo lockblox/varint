@@ -34,6 +34,16 @@ class uleb128 {
   static OutputIterator copy(InputIterator first, InputIterator last,
                              OutputIterator output);
 
+  /** Compare two encoded ranges */
+  template <typename InputIt1, typename InputIt2>
+  static bool less(InputIt1 first1, InputIt1 last1, InputIt2 first2,
+                   InputIt2 last2);
+
+  /** Compare two encoded ranges for inequality */
+  template <typename InputIt1, typename InputIt2>
+  static bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2,
+                    InputIt2 last2);
+
  private:
   template <typename Integral>
   static Integral add(Integral lhs, std::size_t delta);
@@ -128,6 +138,24 @@ OutputIterator uleb128::copy(InputIterator first, InputIterator last,
     *output++ = *first;
   } while (*first++ & 0x80 && first != last);
   return output;
+}
+
+template <typename InputIt1, typename InputIt2>
+bool uleb128::less(InputIt1 first1, InputIt1 last1, InputIt2 first2,
+                   InputIt2 last2) {
+  return std::distance(first1, last1) < std::distance(first2, last2) ||
+         std::lexicographical_compare(first1, last1, first2, last2,
+                                      [](auto x, auto y) {
+                                        return static_cast<unsigned char>(x) <
+                                               static_cast<unsigned char>(y);
+                                      });
+}
+
+template <typename InputIt1, typename InputIt2>
+bool uleb128::equal(InputIt1 first1, InputIt1 last1, InputIt2 first2,
+                    InputIt2 last2) {
+  return std::distance(first1, last1) == std::distance(first2, last2) &&
+         std::equal(first1, last1, first2);
 }
 
 }  // namespace codecs
