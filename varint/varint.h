@@ -17,9 +17,13 @@ class varint {
   varint();
 
   /** Returns an iterator to the beginning of the encoding */
+  auto begin() { return std::begin(data_); }
+  auto begin() const { return std::begin(data_); }
   auto cbegin() const { return std::begin(data_); }
 
   /** Returns an iterator to the end of the encoding */
+  auto end() { return std::end(data_); }
+  auto end() const { return std::end(data_); }
   auto cend() const { return std::end(data_); }
 
   /** Read from a stream */
@@ -67,9 +71,30 @@ class varint {
 };
 
 /** Compare varints with the same codec */
-template <typename Codec, typename LhsContainer, typename RhsContainer>
-bool operator==(const varint<Codec, LhsContainer>& lhs,
-                const varint<Codec, RhsContainer>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator==(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator!=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator<(const varint<Codec, ContainerL>& lhs,
+               const varint<Codec, ContainerR>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator>(const varint<Codec, ContainerL>& lhs,
+               const varint<Codec, ContainerR>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator<=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs);
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator>=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs);
 
 template <typename Container = std::string>
 using uleb128 = varint<codecs::uleb128, Container>;
@@ -142,11 +167,40 @@ varint<Codec, Container>::operator Integral() const {
                                                          std::end(data_));
 }
 
-template <typename Codec, typename LhsContainer, typename RhsContainer>
-bool operator==(const varint<Codec, LhsContainer>& lhs,
-                const varint<Codec, RhsContainer>& rhs) {
-  return lhs.size() == rhs.size() &&
-         std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator==(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs) {
+  return Codec::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator!=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs) {
+  return !(lhs == rhs);
+}
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator<(const varint<Codec, ContainerL>& lhs,
+               const varint<Codec, ContainerR>& rhs) {
+  return Codec::less(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator>(const varint<Codec, ContainerL>& lhs,
+               const varint<Codec, ContainerR>& rhs) {
+  return rhs < lhs;
+}
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator<=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs) {
+  return !(lhs > rhs);
+}
+
+template <typename Codec, typename ContainerL, typename ContainerR>
+bool operator>=(const varint<Codec, ContainerL>& lhs,
+                const varint<Codec, ContainerR>& rhs) {
+  return !(lhs < rhs);
 }
 
 template <typename Codec, typename Container>
