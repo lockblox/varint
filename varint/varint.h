@@ -16,16 +16,6 @@ class varint {
   /** Default constructor */
   varint();
 
-  /** Returns an iterator to the beginning of the encoding */
-  auto begin() { return std::begin(data_); }
-  auto begin() const { return std::begin(data_); }
-  auto cbegin() const { return std::begin(data_); }
-
-  /** Returns an iterator to the end of the encoding */
-  auto end() { return std::end(data_); }
-  auto end() const { return std::end(data_); }
-  auto cend() const { return std::end(data_); }
-
   /** Read from a stream */
   template <typename CodecT, typename ContainerT>
   friend std::istream& operator>>(std::istream& is,
@@ -51,13 +41,16 @@ class varint {
   template <typename Integral>
   explicit operator Integral() const;
 
-  /** Get the encoded data */
-  constexpr const char* data() const;
-
-  /** Get the number of bytes in the encoded data */
-  constexpr std::size_t size() const;
+  /** Convert to string_view */
+  explicit operator std::string_view() const;
 
  private:
+  template <typename T>
+  T get(std::true_type is_integral) const;
+
+  template <typename T>
+  std::string_view get(std::false_type is_integral) const;
+
   auto output_iterator(detail::dynamic_extent_t);
   auto output_iterator(detail::static_extent_t);
 
@@ -139,10 +132,10 @@ void varint<Codec, Container>::assign(Integral value,
                                       detail::static_extent_t extent) {
   static_assert(std::is_signed<Integral>::value ==
                 std::is_signed<Codec>::value);
-  if (size() < Codec::size(value)) {
+  if (data_.size() < Codec::size(value)) {
     throw std::out_of_range("value " + std::to_string(value) +
                             " too large for varint buffer of size " +
-                            std::to_string(size()));
+                            std::to_string(data_.size()));
   }
   Codec::encode(value, output_iterator(extent));
 }
@@ -158,19 +151,39 @@ void varint<Codec, Container>::assign(Integral value,
 }
 
 template <typename Codec, typename Container>
-template <typename Integral>
-varint<Codec, Container>::operator Integral() const {
-  static_assert(std::is_integral<Integral>::value,
-                "cannot cast to non-integral type");
+template <typename T>
+varint<Codec, Container>::operator T() const {
+  static_assert(
+      std::is_integral<T>::value || std::is_same<std::string_view, T>::value,
+      "unsupported cast");
+  using tag = typename std::is_integral<T>::type;
+  return get<T>(tag());
+}
+
+template <typename Codec, typename Container>
+template <typename T>
+T varint<Codec, Container>::get(std::true_type) const {
   using InputIterator = decltype(std::begin(data_));
-  return Codec::template decode<InputIterator, Integral>(std::begin(data_),
-                                                         std::end(data_));
+  return Codec::template decode<InputIterator, T>(std::begin(data_),
+                                                  std::end(data_));
+}
+
+template <typename Codec, typename Container>
+template <typename T>
+std::string_view varint<Codec, Container>::get(std::false_type) const {
+  return static_cast<std::string_view>(*this);
+}
+
+template <typename Codec, typename Container>
+varint<Codec, Container>::operator std::string_view() const {
+  return std::string_view(data_.data(), data_.size());
 }
 
 template <typename Codec, typename ContainerL, typename ContainerR>
 bool operator==(const varint<Codec, ContainerL>& lhs,
                 const varint<Codec, ContainerR>& rhs) {
-  return Codec::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+  return Codec::equal(static_cast<std::string_view>(lhs),
+                      static_cast<std::string_view>(rhs));
 }
 
 template <typename Codec, typename ContainerL, typename ContainerR>
@@ -182,7 +195,8 @@ bool operator!=(const varint<Codec, ContainerL>& lhs,
 template <typename Codec, typename ContainerL, typename ContainerR>
 bool operator<(const varint<Codec, ContainerL>& lhs,
                const varint<Codec, ContainerR>& rhs) {
-  return Codec::less(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+  return Codec::less(static_cast<std::string_view>(lhs),
+                     static_cast<std::string_view>(rhs));
 }
 
 template <typename Codec, typename ContainerL, typename ContainerR>
@@ -201,16 +215,6 @@ template <typename Codec, typename ContainerL, typename ContainerR>
 bool operator>=(const varint<Codec, ContainerL>& lhs,
                 const varint<Codec, ContainerR>& rhs) {
   return !(lhs < rhs);
-}
-
-template <typename Codec, typename Container>
-constexpr const char* varint<Codec, Container>::data() const {
-  return data_.data();
-}
-
-template <typename Codec, typename Container>
-constexpr std::size_t varint<Codec, Container>::size() const {
-  return data_.size();
 }
 
 template <typename Codec, typename Container>
