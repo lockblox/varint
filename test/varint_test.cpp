@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <varint/array.h>
 #include <varint/codecs/uleb128.h>
 #include <varint/varint.h>
 #include <array>
@@ -31,6 +32,8 @@ TEST(varint, assignment) {
   EXPECT_THROW(via = 65536u, std::out_of_range);
   EXPECT_THROW((void)(static_cast<char>(via)), std::overflow_error);
   EXPECT_EQ(static_cast<unsigned int>(via), 1233u);
+  auto via2 = varint::array<varint::codecs::uleb128, 1233u>{};
+  EXPECT_EQ(via2, via);
 }
 
 TEST(varint, input_stream) {
