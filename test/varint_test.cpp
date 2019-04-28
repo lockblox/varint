@@ -44,6 +44,9 @@ TEST(varint, input_stream) {
   std::copy(std::istreambuf_iterator<char>(is),
             std::istreambuf_iterator<char>(), std::back_inserter(hello));
   EXPECT_EQ("hello", hello);
+  auto view = std::string_view(input_string);
+  auto varint_view = varint::uleb128<std::string_view>(view);
+  EXPECT_EQ(2, static_cast<std::string_view>(varint_view).size());
 }
 
 TEST(varint, output_stream) {
