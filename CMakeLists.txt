@@ -50,6 +50,7 @@ if(BUILD_TESTING)
                    varint/detail/extent_type.cpp
                    varint/codecs/uleb128.h
                    varint/codecs/uleb128.cpp
+                   varint/basic_varint.cpp
                    varint/varint.cpp
                    varint/varint.h)
     target_link_libraries(varint_test PRIVATE libvarint GTest::GTest GTest::Main)

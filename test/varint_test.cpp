@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <varint/array.h>
 #include <varint/codecs/uleb128.h>
 #include <varint/varint.h>
 #include <array>
