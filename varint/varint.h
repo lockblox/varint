@@ -61,6 +61,7 @@ class varint {
   void assign(Integral value, detail::dynamic_extent_t extent);
 
   Container data_;
+  std::size_t size_;
 };
 
 /** Compare varints with the same codec */
@@ -100,7 +101,8 @@ template <typename Codec, typename Container>
 varint<Codec, Container>::varint() {}
 
 template <typename Codec, typename Container>
-varint<Codec, Container>::varint(Container data) : data_(std::move(data)) {}
+varint<Codec, Container>::varint(Container data)
+    : data_(std::move(data)), size_(Codec::size(data_.begin(), data_.end())) {}
 
 template <typename Codec, typename Container>
 template <typename Integral>
@@ -138,6 +140,7 @@ void varint<Codec, Container>::assign(Integral value,
                             std::to_string(data_.size()));
   }
   Codec::encode(value, output_iterator(extent));
+  size_ = data_.size();
 }
 
 template <typename Codec, typename Container>
@@ -148,6 +151,7 @@ void varint<Codec, Container>::assign(Integral value,
                 std::is_signed<Codec>::value);
   data_.clear();
   data_.resize(Codec::encode(value, output_iterator(extent)));
+  size_ = data_.size();
 }
 
 template <typename Codec, typename Container>
@@ -164,8 +168,10 @@ template <typename Codec, typename Container>
 template <typename T>
 T varint<Codec, Container>::get(std::true_type) const {
   using InputIterator = decltype(std::begin(data_));
-  return Codec::template decode<InputIterator, T>(std::begin(data_),
-                                                  std::end(data_));
+  auto begin = std::begin(data_);
+  auto end = begin;
+  std::advance(end, size_);
+  return Codec::template decode<InputIterator, T>(begin, end);
 }
 
 template <typename Codec, typename Container>
@@ -176,7 +182,7 @@ std::string_view varint<Codec, Container>::get(std::false_type) const {
 
 template <typename Codec, typename Container>
 varint<Codec, Container>::operator std::string_view() const {
-  return std::string_view(data_.data(), data_.size());
+  return std::string_view(data_.data(), size_);
 }
 
 template <typename Codec, typename ContainerL, typename ContainerR>
@@ -219,10 +225,12 @@ bool operator>=(const varint<Codec, ContainerL>& lhs,
 
 template <typename Codec, typename Container>
 std::istream& operator>>(std::istream& is, varint<Codec, Container>& vi) {
+  auto pos = is.tellg();
   using extent_type = typename detail::extent_type<Container>::type;
   Codec::copy(std::istreambuf_iterator<char>(is),
               std::istreambuf_iterator<char>(),
               vi.output_iterator(extent_type()));
+  vi.size_ = is.tellg() - pos;
   return is;
 }
 
