@@ -119,6 +119,7 @@ constexpr std::size_t uleb128::size(InputIterator first, InputIterator last) {
       return result;
     }
   }
+  return 0;
 }
 
 template <typename InputIterator, typename OutputIterator>
