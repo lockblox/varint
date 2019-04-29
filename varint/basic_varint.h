@@ -95,7 +95,7 @@ bool operator>=(const basic_varint<Codec, ContainerL>& lhs,
 /******************************************************************************/
 
 template <typename Codec, typename Container>
-basic_varint<Codec, Container>::basic_varint() {}
+basic_varint<Codec, Container>::basic_varint() : size_(0) {}
 
 template <typename Codec, typename Container>
 basic_varint<Codec, Container>::basic_varint(Container data)

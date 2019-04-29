@@ -25,6 +25,8 @@ TEST(varint, assignment) {
   using array = std::array<char, 2>;
   using varint_array = varint::uleb128<array>;
   varint_array via;
+  auto via_view = static_cast<std::string_view>(via);
+  EXPECT_EQ(std::string_view(), via_view);
   via = 1233u;
   auto copy = via;
   EXPECT_EQ(via, copy);
